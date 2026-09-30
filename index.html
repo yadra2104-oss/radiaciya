@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест: Радіаційна безпека</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8edf3 50%, #d9e2ec 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+}
+
+.container {
+  max-width: 800px;
+  width: 100%;
+  padding: 40px;
+  position: relative;
+}
+
+h1 {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 2.2em;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  text-align: center;
+  color: #7f8c8d;
+  margin-bottom: 30px;
+  font-size: 1.1em;
+}
+
+.icon {
+  font-size: 3.5em;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  color: #34495e;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.95em;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
+  font-size: 1em;
+  background: rgba(255,255,255,0.8);
+  color: #2c3e50;
+  transition: all 0.3s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102,126,234,0.15);
+}
+
+.btn {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.1em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102,126,234,0.5);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.info-box {
+  background: rgba(102, 126, 234, 0.1);
+  border-left: 4px solid #667eea;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: #34495e;
+  font-size: 0.9em;
+  line-height: 1.6;
+}
+
+.info-box b { color: #667eea; }
+
+.blocked-warning {
+  background: rgba(231, 76, 60, 0.1);
+  border-left: 4px solid #e74c3c;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: #c0392b;
+  font-weight: 600;
+}
+
+/* Quiz Screen */
+#quiz-screen { display: none; }
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.progress-container {
+  flex: 1;
+  min-width: 200px;
+}
+
+.progress-label {
+  font-size: 0.85em;
+  color: #7f8c8d;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.progress-bar {
+  height: 10px;
+  background: rgba(102, 126, 234, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+.timer {
+  font-size: 1.8em;
+  font-weight: 800;
+  color: #667eea;
+  min-width: 80px;
+  text-align: center;
+  background: rgba(255,255,255,0.7);
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 2px solid rgba(102,126,234,0.3);
+}
+
+.timer.warning {
+  color: #e74c3c;
+  border-color: #e74c3c;
+  animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.question-card {
+  padding: 30px;
+  margin-bottom: 20px;
+}
+
+.question-number {
+  color: #764ba2;
+  font-size: 0.9em;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.question-text {
+  font-size: 1.2em;
+  color: #2c3e50;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option {
+  padding: 16px 20px;
+  background: rgba(255,255,255,0.8);
+  border: 2px solid rgba(102,126,234,0.2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #2c3e50;
+  font-size: 1em;
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+.option:hover {
+  border-color: #667eea;
+  background: rgba(102,126,234,0.08);
+  transform: translateX(4px);
+}
+
+.option.selected {
+  border-color: #667eea;
+  background: rgba(102,126,234,0.15);
+  box-shadow: 0 2px 8px rgba(102,126,234,0.2);
+}
+
+.option-letter {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(102,126,234,0.2);
+  color: #667eea;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+
+/* Violation notification */
+.violation-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(231,76,60,0.4);
+  font-weight: 700;
+  z-index: 10000;
+  display: none;
+  animation: slideIn 0.3s ease;
+  max-width: 300px;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.violation-count {
+  font-size: 0.85em;
+  color: #e74c3c;
+  font-weight: 700;
+}
+
+/* Result Screen */
+#result-screen { display: none; }
+
+.result-icon {
+  font-size: 5em;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.result-title {
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.result-box {
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(102,126,234,0.15);
+  color: #34495e;
+}
+
+.result-row:last-child { border-bottom: none; }
+.result-row b { color: #2c3e50; }
+
+.grade {
+  font-size: 4em;
+  text-align: center;
+  font-weight: 900;
+  margin: 20px 0;
+}
+
+.grade-5 { color: #27ae60; }
+.grade-4 { color: #3498db; }
+.grade-3 { color: #f39c12; }
+.grade-2 { color: #e67e22; }
+.grade-1 { color: #e74c3c; }
+
+@media (max-width: 600px) {
+  .container { padding: 24px; }
+  h1 { font-size: 1.6em; }
+  .question-text { font-size: 1.05em; }
+}
+</style>
+</head>
+<body>
+
+<div class="violation-toast" id="violationToast"></div>
+
+<!-- Start Screen -->
+<div class="container glass" id="start-screen">
+  <div class="icon">☢️</div>
+  <h1>Радіаційна безпека</h1>
+  <p class="subtitle">Тест для студентів медичного коледжу</p>
+
+  <div class="info-box">
+    📋 <b>Параметри тесту:</b><br>
+    • 25 питань<br>
+    • 12 секунд на кожне питання<br>
+    • 5-бальна система оцінювання<br>
+    • Заборонено перемикання вкладок та вихід з повноекранного режиму
+  </div>
+
+  <div id="blockedInfo"></div>
+
+  <div class="input-group">
+    <label>Прізвище та Ім'я</label>
+    <input type="text" id="studentName" placeholder="Введіть ПІБ" autocomplete="off">
+  </div>
+
+  <div class="input-group">
+    <label>Група</label>
+    <input type="text" id="studentGroup" placeholder="Наприклад: МС-21" autocomplete="off">
+  </div>
+
+  <button class="btn" id="startBtn" onclick="startTest()">🚀 Розпочати тест</button>
+</div>
+
+<!-- Quiz Screen -->
+<div class="container" id="quiz-screen">
+  <div class="top-bar">
+    <div class="progress-container">
+      <div class="progress-label">Питання <span id="currentQ">1</span> з <span id="totalQ">25</span>
+        <span class="violation-count" id="violationDisplay"></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+    <div class="timer" id="timer">12</div>
+  </div>
+
+  <div class="question-card glass" id="questionCard">
+    <div class="question-number" id="qNumber">Питання 1</div>
+    <div class="question-text" id="qText"></div>
+    <div class="options" id="optionsContainer"></div>
+  </div>
+</div>
+
+<!-- Result Screen -->
+<div class="container glass" id="result-screen">
+  <div class="result-icon" id="resultIcon">🏆</div>
+  <div class="result-title">Тест завершено!</div>
+  <div class="grade" id="gradeDisplay">5</div>
+  <div class="result-box glass">
+    <div class="result-row"><span>Студент:</span> <b id="rName"></b></div>
+    <div class="result-row"><span>Група:</span> <b id="rGroup"></b></div>
+    <div class="result-row"><span>Тема:</span> <b>Радіаційна безпека</b></div>
+    <div class="result-row"><span>Дата:</span> <b id="rDate"></b></div>
+    <div class="result-row"><span>Правильних відповідей:</span> <b id="rCorrect"></b></div>
+    <div class="result-row"><span>Оцінка:</span> <b id="rGrade"></b> балів</div>
+    <div class="result-row"><span>Порушень:</span> <b id="rViolations"></b></div>
+  </div>
+</div>
+
+<script>
+// ===== QUESTIONS =====
+const questions = [
+  {
+    q: "Який принцип НЕ входить до трьох основних принципів захисту від радіації?",
+    opts: ["Час", "Відстань", "Екран", "Медикаменти"],
+    correct: 3
+  },
+  {
+    q: "Чому дорівнює 1 Зіверт (Зв)?",
+    opts: ["100 рад", "100 бер", "100 рентген", "3,7·10¹⁰ Бк"],
+    correct: 1
+  },
+  {
+    q: "Чому дорівнює 1 Грей (Гр)?",
+    opts: ["100 бер", "100 рад", "100 рентген", "3,7·10¹⁰ Бк"],
+    correct: 1
+  },
+  {
+    q: "Скільки Бекерелів у 1 Кюрі (Кі)?",
+    opts: ["3,7·10⁸", "3,7·10⁹", "3,7·10¹⁰", "3,7·10¹²"],
+    correct: 2
+  },
+  {
+    q: "Який є нормальним радіаційним фоном?",
+    opts: ["0,01–0,05 мкЗв/год", "0,08–0,30 мкЗв/год", "0,5–1,0 мкЗв/год", "1,0–5,0 мкЗв/год"],
+    correct: 1
+  },
+  {
+    q: "Чим можна зупинити альфа-випромінювання?",
+    opts: ["Алюміній 3 мм", "Свинець 10 см", "Аркуш паперу", "Бетон"],
+    correct: 2
+  },
+  {
+    q: "Чим можна зупинити бета-випромінювання?",
+    opts: ["Аркуш паперу", "Алюміній 3 мм", "Свинець 10 см", "Одяг"],
+    correct: 1
+  },
+  {
+    q: "Чим можна зупинити гамма-випромінювання?",
+    opts: ["Аркуш паперу", "Алюміній 3 мм", "Свинець 10 см", "Гумові рукавички"],
+    correct: 2
+  },
+  {
+    q: "Що характеризує еквівалентна доза?",
+    opts: ["Кількість розпадів за секунду", "Іонізацію повітря", "Енергію, поглинуту 1 кг", "Біологічний ефект з урахуванням виду випромінювання"],
+    correct: 3
+  },
+  {
+    q: "Який ваговий коефіцієнт (wR) у альфа-випромінювання?",
+    opts: ["1", "5", "10", "20"],
+    correct: 3
+  },
+  {
+    q: "Як органи чуття людини сприймають радіацію?",
+    opts: ["Має специфічний запах", "Відчувається на смак", "Не сприймають органами чуття", "Викликає відчуття тепла"],
+    correct: 2
+  },
+  {
+    q: "Який радіонуклід використовується для лікування щитоподібної залози?",
+    opts: ["Tc-99m", "I-131", "Co-60", "Po-210"],
+    correct: 1
+  },
+  {
+    q: "Який радіонуклід використовується для діагностики в ядерній медицині?",
+    opts: ["I-131", "Co-60", "Tc-99m", "Rn-222"],
+    correct: 2
+  },
+  {
+    q: "Що означає принцип ALARA?",
+    opts: ["As Low As Reasonably Achievable", "As Long As Required Always", "Always Low Active Radiation Area", "Automatic Limit Against Radiation Accident"],
+    correct: 0
+  },
+  {
+    q: "Що характеризує активність джерела (Бекерель)?",
+    opts: ["Іонізацію повітря", "Енергію випромінювання", "Кількість радіоактивних розпадів за 1 секунду", "Біологічний ефект"],
+    correct: 2
+  },
+  {
+    q: "Що характеризує поглинена доза (Грей)?",
+    opts: ["Кількість розпадів", "Енергію випромінювання, поглинуту 1 кг речовини", "Біологічний ефект", "Іонізацію повітря"],
+    correct: 1
+  },
+  {
+    q: "Що характеризує експозиційна доза (Рентген)?",
+    opts: ["Іонізацію повітря гамма- та бета-випромінюванням", "Енергію поглинання", "Біологічний ефект", "Кількість розпадів"],
+    correct: 0
+  },
+  {
+    q: "Яка одиниця СІ для еквівалентної дози?",
+    opts: ["Грей", "Бекерель", "Зіверт", "Рентген"],
+    correct: 2
+  },
+  {
+    q: "Яка одиниця СІ для поглиненої дози?",
+    opts: ["Зіверт", "Грей", "Бекерель", "Кулон/кг"],
+    correct: 1
+  },
+  {
+    q: "Яка одиниця СІ для активності джерела?",
+    opts: ["Кюрі", "Бекерель", "Рентген", "Грей"],
+    correct: 1
+  },
+  {
+    q: "Що є головним показником дозиметра?",
+    opts: ["Активність джерела", "Поглинена доза", "Потужність дози", "Експозиційна доза"],
+    correct: 2
+  },
+  {
+    q: "За яких умов проводиться йодна профілактика?",
+    opts: ["За бажанням населення", "Тільки за рішенням влади", "Автоматично після оповіщення", "За призначенням сімейного лікаря"],
+    correct: 1
+  },
+  {
+    q: "Який тип загрози характерний для альфа-випромінювання при вдиханні?",
+    opts: ["Мінімальна", "Помірна", "Максимальна", "Відсутня"],
+    correct: 2
+  },
+  {
+    q: "Яка природа альфа-випромінювання?",
+    opts: ["Потік електронів", "Потік ядер гелію-4", "Електромагнітне випромінювання", "Потік нейтронів"],
+    correct: 1
+  },
+  {
+    q: "Скільки часу можуть пробігати альфа-частинки у повітрі?",
+    opts: ["Кілька міліметрів", "Кілька сантиметрів", "Кілька метрів", "Кілька кілометрів"],
+    correct: 1
+  },
+  {
+    q: "Який препарат використовується для йодної профілактики?",
+    opts: ["Натрію хлорид", "Калію йодид", "Кальцію глюконат", "Аскорбінова кислота"],
+    correct: 1
+  },
+  {
+    q: "Який радіонуклід використовується в променевій терапії разом з лінійними прискорювачами?",
+    opts: ["Tc-99m", "I-131", "Co-60", "Rn-222"],
+    correct: 2
+  },
+  {
+    q: "Яка фаза радіаційної аварії передбачає евакуацію та йодну профілактику?",
+    opts: ["Рання фаза", "Проміжна фаза", "Пізня фаза", "Реабілітаційна фаза"],
+    correct: 0
+  },
+  {
+    q: "Який тип опромінення виникає при потраплянні радіоактивних речовин з їжею та водою?",
+    opts: ["Зовнішнє опромінення", "Внутрішнє забруднення", "Зовнішнє забруднення", "Контактне опромінення"],
+    correct: 1
+  },
+  {
+    q: "Які засоби захисту необхідні від альфа-випромінювання при внутрішній загрозі?",
+    opts: ["Свинцевий фартух", "Респіратор та спецодяг", "Гумові чоботи", "Захисні окуляри"],
+    correct: 1
+  }
+];
+
+// ===== STATE =====
+let studentName = '';
+let studentGroup = '';
+let currentQuestion = 0;
+let score = 0;
+let violations = 0;
+let timerInterval = null;
+let timeLeft = 12;
+let shuffledQuestions = [];
+let testStarted = false;
+
+// ===== BLOCKED KEY SHORTCUTS & EVENTS =====
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  addViolation('Контекстне меню заблоковано');
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'F12' || (e.ctrlKey && (e.key === 'c' || e.key === 'C' || e.key === 'v' || e.key === 'V' || e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P' || e.key === 'a' || e.key === 'A'))) {
+    e.preventDefault();
+    addViolation('Комбінація клавіш заблокована');
+    return false;
+  }
+  if (e.key === 'PrintScreen') {
+    e.preventDefault();
+    addViolation('PrintScreen заблоковано');
+    navigator.clipboard.writeText('').catch(()=>{});
+    return false;
+  }
+});
+
+document.addEventListener('copy', e => {
+  if (testStarted) {
+    e.preventDefault();
+    addViolation('Копіювання заблоковано');
+  }
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (testStarted && document.hidden) {
+    addViolation('Перемикання вкладок заборонено');
+  }
+});
+
+window.addEventListener('blur', () => {
+  if (testStarted) {
+    addViolation('Втрата фокусу вікна');
+  }
+});
+
+document.addEventListener('fullscreenchange', () => {
+  if (testStarted && !document.fullscreenElement) {
+    addViolation('Вихід з повноекранного режиму');
+    setTimeout(() => {
+      if (testStarted && !document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(()=>{});
+      }
+    }, 100);
+  }
+});
+
+function addViolation(reason) {
+  violations++;
+  const toast = document.getElementById('violationToast');
+  toast.textContent = `⚠️ Порушення ${violations}/3: ${reason}`;
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 3000);
+
+  const vd = document.getElementById('violationDisplay');
+  if (vd) vd.textContent = ` • Порушення: ${violations}/3`;
+
+  if (violations >= 3) {
+    endTest(true);
+  }
+}
+
+// ===== START =====
+function startTest() {
+  studentName = document.getElementById('studentName').value.trim();
+  studentGroup = document.getElementById('studentGroup').value.trim();
+
+  if (!studentName || !studentGroup) {
+    alert('Будь ласка, заповніть усі поля');
+    return;
+  }
+
+  const storageKey = 'radiation_test_completed';
+  const existing = JSON.parse(localStorage.getItem(storageKey) || '{}');
+  
+  if (existing[studentName]) {
+    const prev = existing[studentName];
+    document.getElementById('blockedInfo').innerHTML = `
+      <div class="blocked-warning">
+        ⚠️ Ви вже проходили цей тест!<br>
+        📅 Дата: ${prev.date}<br>
+        📊 Оцінка: ${prev.grade} балів<br>
+        Повторне проходження заборонено.
+      </div>`;
+    document.getElementById('startBtn').disabled = true;
+    return;
+  }
+
+  // Enter fullscreen
+  document.documentElement.requestFullscreen().catch(err => {
+    alert('Необхідно дозволити повноекранний режим');
+    return;
+  });
+
+  testStarted = true;
+  
+  // Shuffle questions
+  shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+  shuffledQuestions = shuffledQuestions.slice(0, 25);
+  
+  // Shuffle options for each question
+  shuffledQuestions = shuffledQuestions.map(q => {
+    const indexed = q.opts.map((opt, idx) => ({opt, idx}));
+    indexed.sort(() => Math.random() - 0.5);
+    const newCorrect = indexed.findIndex(x => x.idx === q.correct);
+    return { q: q.q, opts: indexed.map(x => x.opt), correct: newCorrect };
+  });
+
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  document.getElementById('totalQ').textContent = shuffledQuestions.length;
+
+  showQuestion();
+}
+
+function showQuestion() {
+  if (currentQuestion >= shuffledQuestions.length) {
+    endTest(false);
+    return;
+  }
+
+  const q = shuffledQuestions[currentQuestion];
+  document.getElementById('qNumber').textContent = `Питання ${currentQuestion + 1}`;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('currentQ').textContent = currentQuestion + 1;
+  
+  const progress = ((currentQuestion) / shuffledQuestions.length) * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  
+  q.opts.forEach((opt, idx) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.innerHTML = `<span class="option-letter">${letters[idx]}</span><span>${opt}</span>`;
+    div.onclick = () => selectAnswer(idx, div);
+    container.appendChild(div);
+  });
+
+  startTimer();
+}
+
+function selectAnswer(idx, element) {
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  element.classList.add('selected');
+  
+  clearInterval(timerInterval);
+  
+  const q = shuffledQuestions[currentQuestion];
+  if (idx === q.correct) score++;
+  
+  setTimeout(() => {
+    currentQuestion++;
+    showQuestion();
+  }, 300);
+}
+
+function startTimer() {
+  timeLeft = 12;
+  const timerEl = document.getElementById('timer');
+  timerEl.textContent = timeLeft;
+  timerEl.classList.remove('warning');
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = timeLeft;
+
+    if (timeLeft <= 5) {
+      timerEl.classList.add('warning');
+    }
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      currentQuestion++;
+      showQuestion();
+    }
+  }, 1000);
+}
+
+function endTest(byViolation) {
+  testStarted = false;
+  clearInterval(timerInterval);
+  
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(()=>{});
+  }
+
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+
+  let grade;
+  if (byViolation) {
+    grade = 0;
+    score = 0;
+  } else {
+    const percent = (score / shuffledQuestions.length) * 100;
+    if (percent >= 90) grade = 5;
+    else if (percent >= 75) grade = 4;
+    else if (percent >= 60) grade = 3;
+    else if (percent >= 40) grade = 2;
+    else grade = 1;
+  }
+
+  const now = new Date();
+  const dateStr = now.toLocaleString('uk-UA');
+
+  document.getElementById('rName').textContent = studentName;
+  document.getElementById('rGroup').textContent = studentGroup;
+  document.getElementById('rDate').textContent = dateStr;
+  document.getElementById('rCorrect').textContent = `${score} з ${shuffledQuestions.length}`;
+  document.getElementById('rGrade').textContent = grade;
+  document.getElementById('rViolations').textContent = violations;
+  
+  const gradeDisplay = document.getElementById('gradeDisplay');
+  gradeDisplay.textContent = grade;
+  gradeDisplay.className = 'grade grade-' + grade;
+
+  const icons = {5: '🏆', 4: '👍', 3: '📘', 2: '⚠️', 1: '❌', 0: '🚫'};
+  document.getElementById('resultIcon').textContent = icons[grade] || '📊';
+
+  // Save to localStorage
+  const storageKey = 'radiation_test_completed';
+  const existing = JSON.parse(localStorage.getItem(storageKey) || '{}');
+  existing[studentName] = { date: dateStr, grade: grade, group: studentGroup };
+  localStorage.setItem(storageKey, JSON.stringify(existing));
+
+  // Send to Telegram
+  sendToTelegram(studentName, studentGroup, dateStr, grade, violations, score, shuffledQuestions.length);
+}
+
+async function sendToTelegram(name, group, date, grade, violations, correct, total) {
+  const botToken = '8977852457:AAH1jJz54Wb5WFxNn1CrpBlRKbML7Pf_2zs';
+  const chatId = '622617127';
+  
+  const message = `📋 *Результати тесту*\n\n` +
+    `👤 *ПІБ:* ${name}\n` +
+    `👥 *Група:* ${group}\n` +
+    `📅 *Дата:* ${date}\n` +
+    `📚 *Тема:* Радіаційна безпека\n` +
+    `✅ *Результат:* ${correct}/${total}\n` +
+    `⭐ *Оцінка:* ${grade} балів\n` +
+    `⚠️ *Порушень:* ${violations}`;
+
+  try {
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown'
+      })
+    });
+  } catch (e) {
+    console.error('Telegram error:', e);
+  }
+}
+
+// Prevent back button
+window.addEventListener('popstate', () => {
+  if (testStarted) {
+    history.pushState(null, '', window.location.href);
+    addViolation('Спроба повернення назад');
+  }
+});
+history.pushState(null, '', window.location.href);
+</script>
+
+</body>
+</html>
